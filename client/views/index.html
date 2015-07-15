@@ -39,9 +39,10 @@
         <div class="row center_div">
             <div class="panel panel-info">
                 <div class="panel-heading">Create a Watch</div>
-                <div class="panel-body" ng-app="monitorApp" ng-controller="websitesController">
-                    <!-- Add websiteto monitor form -->
-                    {{asas}}
+                <div class="panel-body" ng-app="monitorApp" ng-controller="addWebsiteController">
+                    
+                    <!-- Add website to check it -->
+                    
                     <form class="form-inline" role="form" ng-submit="addWebsites()">
                         <div class="row">
                             <!-- LEFT SIDE -->
@@ -129,33 +130,7 @@
                     </form>
                 </div>
             </div>
-            <div ng-app="websiteList" ng-controller="websiteTable">
-                {{asdf}}
-                <table st-table="webResult" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>URL</th>
-                            <th>Poll Interval</th>
-                            <th>Mail ID</th>
-                            <th>Mobile Number</th>
-                            <th>Mobile Provider</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="row in webResult">
-                            <td>{{row.name}}</td>
-                            <td>{{row.url}}</td>
-                            <td>{{row.pollInterval}}</td>
-                            <td>{{row.mailID}}</td>
-                            <td>{{row.mobileNumber}}</td>
-                            <td>{{row.mobileProvider}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 </body>
-
 </html>

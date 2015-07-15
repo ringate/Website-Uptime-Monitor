@@ -1,4 +1,4 @@
-app.controller('websitesController', ['$scope', '$resource', function ($scope, $resource) {
+app.controller('addWebsiteController', ['$scope', '$resource', function ($scope, $resource) {
 
 	var Monitor = $resource('/api/websites');
 
