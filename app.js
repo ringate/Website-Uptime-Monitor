@@ -1,5 +1,7 @@
 var express 			= require('express'),
     app 				= express(),
+    server 				= require('http').createServer(app),
+	io 					= require('socket.io').listen(server),
     bodyParser 			= require('body-parser'),
     mongoose 			= require('mongoose'),
     Curl 				= require('node-libcurl').Curl,
@@ -19,24 +21,45 @@ app.get('/urlAdded', function(req, res) {
     res.sendFile(__dirname + '/client/views/urlAdded.html');
 });
 
+
 //to link js and css file in HTML files
 app.use('/js', express.static(__dirname + '/client/js'));
 app.use('/css', express.static(__dirname + '/client/css'));
+
 
 //REST API
 app.post('/api/websites', websiteListController.create);
 app.get('/api/websites', websiteTableController.list);
 
-app.listen(3000, function() {
-    console.log('Listening ...');
+
+//socket.io incommming and outgoing socket requests
+var sockets = [];		//array to store the socket ID of all the clients that are connected with this server
+
+io.sockets.on('connection', function(socket) {
+
+	sockets.push(socket);		//appending the socket ID of the client to the array
+
+	socket.on('createNote', function(data) {
+		//socket.broadcast.emit('onNoteCreated', data);
+		console.log(data);
+	});
+
+	if(sockets.length > 2)
+	{
+		checkStatus('http://www.google.com/404');
+	}
 });
 
 // checkStatus('http://www.facebook.com/404');
-// checkStatus('http://www.google.com/404');
 // checkStatus('http://anandhsomu.com');
 // checkStatus('http://anandhsomasddadadu.com');
 
-sendAlertMail();
+//sendAlertMail();
+
+server.listen(3000, function() {
+    console.log('Listening ...');
+});
+
 
 function checkStatus(url)
 {
@@ -49,6 +72,7 @@ function checkStatus(url)
 
 		console.info( 'URL', url);
 	    console.info( 'Status Code: ', statusCode );
+	    io.sockets.emit('onNoteCreated', statusCode);
 	    console.info( 'TOTAL_TIME: ', this.getInfo('TOTAL_TIME') );
 	    console.info( 'Body length: ', body.length );
 
