@@ -1,14 +1,13 @@
-var express 			= require('express'),
-    app 				= express(),
-    server 				= require('http').createServer(app),
-	io 					= require('socket.io').listen(server),
-    bodyParser 			= require('body-parser'),
-    mongoose 			= require('mongoose'),
-    nodemailer 			= require('nodemailer'),
-    smtpPool 			= require('nodemailer-smtp-pool'),
-    socketMVC 			= require('socket.mvc'),
-    websiteListController = require('./server/controllers/websitelist-controller'),
-    websiteTableController = require('./server/controllers/websiteTable-controller');
+var express 				= require('express'),
+    app 					= express(),
+    server 					= require('http').createServer(app),
+	io 						= require('socket.io').listen(server),
+    bodyParser 				= require('body-parser'),
+    mongoose 				= require('mongoose'),
+    socketMVC 				= require('socket.mvc'),
+    websiteListController   = require('./server/controllers/websitelist-controller'),
+    websiteTableController  = require('./server/controllers/websiteTable-controller'),
+    config 					= require('./config');
 
 mongoose.connect('mongodb://localhost:27017/web-monitor');
 app.use(bodyParser());
@@ -49,14 +48,14 @@ io.sockets.on('connection', function (socket) {
     filePath: ['./server/routes/socket.js']
   });
 });
-
+/*
 function sendAlertMail()
 {
 	var transporter = nodemailer.createTransport({
 	    service: 'Gmail',
 	    auth: {
-	        user: '@gmail.com',
-	        pass: ''
+	        user: config.gmail.user_name,
+	        pass: config.gmail.password
 	    }
 	});
 	
@@ -76,7 +75,7 @@ function sendAlertMail()
 	    console.log('Message sent: ' + info.response);
 
 	});
-	/*// create reusable transporter object using SMTP transport
+	// create reusable transporter object using SMTP transport
 	var transport = nodemailer.createTransport(smtpPool({
 	    host: 'smtp.mailgun.org',
 	    port: 25,
@@ -110,5 +109,5 @@ function sendAlertMail()
 	    }
 	    console.info('Message sent: ' + info.response);
 
-	});*/
-}
+	});
+}*/

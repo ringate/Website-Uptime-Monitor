@@ -1,6 +1,12 @@
 var Monitor   = require('../models/websites');
+var Ping = require('../models/pings');
 var Curl      = require('node-libcurl').Curl;
 var socketMVC = require('socket.mvc');
+var getStatusMsg    = require('statuses');
+var nodemailer = require('nodemailer');
+var smtpPool = require('nodemailer-smtp-pool');
+var config = require('../../config');
+
  
 /*Login logic*/
 
@@ -50,7 +56,7 @@ function checkStatus(url, name)
 
         console.info( 'URL', url);
         console.info( 'Status Code: ', statusCode );
-        socketMVC.everyone('websiteStatus', {'name' : name, 'statusCode' : statusCode});
+        pushStatusToClients(name, url, statusCode, this.getInfo('TOTAL_TIME'));
         console.info( 'TOTAL_TIME: ', this.getInfo('TOTAL_TIME') );
         console.info( 'Body length: ', body.length );
 
@@ -67,7 +73,7 @@ function cb(statusOrError)
     if(siteName == undefined)
     {
 
-    }   
+    }
 
     this.close();
 
@@ -77,6 +83,132 @@ function cb(statusOrError)
         console.info(siteName, ': ', statusOrError);
     }
     return;
+}
+
+function pushStatusToClients(name, url, statusCode, responseTime)
+{
+    var isUp;
+    if(parseInt(statusCode) == 200)
+    {
+        isUp = "true";
+    }
+    socketMVC.everyone('websiteStatus', {'name' : name, 'statusCode' : statusCode, 'isUp' : isUp, 'responseTime': responseTime});
+   
+    updateWebsitesMongoDB(name, url, statusCode, responseTime, isUp);
+}
+
+function updateWebsitesMongoDB(name, url, statusCode, responseTime, isUp)
+{
+    /*
+    Spent a lot of time in this function. Monitor.findOne is an async fuction. Without knowing that i tried to compare isUpDB(outcome of the
+    call back function). The  solution is to write the comparison and the following update inside the call back function of first one, so that
+    this will finish invoke them 
+
+    */
+    var isUpDB;
+    var email;
+    var mobileNum;
+    var mobileProvider;
+
+    Monitor.findOne({'name': name}, function(err, results) {
+        console.log(results);
+        isUpDB = results.isUp;
+       
+       addWebsitePingMongoDB(results._id, name, statusCode, responseTime, isUp);
+
+       if(isUpDB === isUp)
+       {
+            return;
+       }
+
+       if(results.isAlert)
+       {
+            email = results.mailID;
+            mobileNum = results.mobileNumber;
+            mobileProvider = results.mobileProvider;
+       }
+
+        Monitor.findOneAndUpdate({ 'name': name}, {$set: { 'statusCode': statusCode, 'responseTime': responseTime, 'isUp': isUp }}, function(err, user) {
+            if (err) throw err;
+            console.log("updating " + user._id);
+        });
+
+        //sendAlertMail(isUp, url, email, mobileNum, mobileProvider);
+
+    });
+}
+
+function addWebsitePingMongoDB(websiteID, name, statusCode, responseTime, isUp)
+{
+    var ping = new Ping();
+    ping.name = name;
+    ping.websiteID = websiteID;
+    ping.isUp = isUp;
+    ping.statusCode = statusCode;
+    ping.responseTime = responseTime;
+
+    ping.save(function(result) {
+        console.log("saved - PING");
+    });
+}
+
+function sendAlertMail(isUp, url, email, mobileNum, mobileProvider)
+{
+    var sub;
+    var transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: config.gmail.user_name,
+            pass: config.gmail.password
+        }
+    });
+    
+    if(isUp === 'true')
+    {
+        sub = url + " is Up and Running";
+    }
+    else
+    {
+        sub = url + " is Down";
+    }
+
+    // setup e-mail data with unicode symbols
+    var mailOptions = {
+       from: 'Webmonitor Service <yesiamsham@gmail.com>',
+        to: email,
+        subject: sub,
+        text: sub + "\n Kindly check your website"
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, function(error, info){
+        if(error){
+            return console.log(error);
+        }
+        console.log('Message sent: ' + info.response);
+
+    });
+
+    if(mobileProvider === 'att')
+    {
+        mobileNum = mobileNum + "@txt.att.net";
+    }
+        // setup e-mail data with unicode symbols
+    var smsOptions = {
+       from: 'Webmonitor Service <yesiamsham@gmail.com>',
+        to: mobileNum,
+        subject: sub,
+        text: sub + "\n Kindly check your website"
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(smsOptions, function(error, info){
+        if(error){
+            return console.log(error);
+        }
+        console.log('SMS sent: ' + info.response);
+
+    });
 }
 
 /*
