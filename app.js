@@ -16,7 +16,7 @@ app.use(bodyParser());
 app.get('/', function(req, res) {
     res.sendFile(__dirname + '/client/views/index.html');
 });
-app.get('/urlAdded', function(req, res) {
+app.get('/listWebsites', function(req, res) {
     res.sendFile(__dirname + '/client/views/urlAdded.html');
 });
 

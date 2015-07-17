@@ -22,7 +22,6 @@ module.exports.create = function(req, res) {
                 }
             } else {
                 console.log(err.errors[field].message)
-                
             }
         }
         else
@@ -151,6 +150,14 @@ function addWebsitePingMongoDB(websiteID, name, statusCode, responseTime, isUp)
         console.log("saved - PING");
     });
 }
+
+var removeFromTimer = function(name)
+{
+    clearInterval(timers[name]);
+    console.log(name + ' - interval cleared');   
+}
+
+exports.removeFromTimer = removeFromTimer;
 
 function sendAlertMail(isUp, url, email, mobileNum, mobileProvider)
 {
