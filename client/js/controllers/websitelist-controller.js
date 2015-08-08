@@ -9,6 +9,7 @@ app.controller('addWebsiteController', ['$scope', '$resource', function ($scope,
 	$scope.mobileNumber = "4124255273";
 	$scope.mobileProvider = "T-Mobile";
 	
+	//add website information to database
 	$scope.addWebsites = function() {
 		var monitor = new Monitor();
 		monitor.name = $scope.websiteName;

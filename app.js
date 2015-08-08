@@ -7,6 +7,7 @@ var express 				= require('express'),
     socketMVC 				= require('socket.mvc'),
     websiteListController   = require('./server/controllers/websitelist-controller'),
     websiteTableController  = require('./server/controllers/websiteTable-controller'),
+    websiteGraphController  = require('./server/controllers/websitePingData-controller'),
     config 					= require('./config');
 
 mongoose.connect('mongodb://localhost:27017/web-monitor');
@@ -19,7 +20,9 @@ app.get('/', function(req, res) {
 app.get('/listWebsites', function(req, res) {
     res.sendFile(__dirname + '/client/views/urlAdded.html');
 });
-
+app.get('/graphs', function(req, res) {
+    res.sendFile(__dirname + '/client/views/websiteGraph.html');
+});
 
 //to link js and css file in HTML files
 app.use('/js', express.static(__dirname + '/client/js'));
@@ -29,7 +32,7 @@ app.use('/css', express.static(__dirname + '/client/css'));
 //REST API
 app.post('/api/websites', websiteListController.create);
 app.get('/api/websites', websiteTableController.list);
-
+app.get('/api/getGraphData', websiteGraphController.list);
 // checkStatus('http://www.facebook.com/404');
 // checkStatus('http://anandhsomu.com');
 // checkStatus('http://anandhsomasddadadu.com');
@@ -41,7 +44,7 @@ server.listen(3000, function() {
 });
 
 //Set socket.io configuration here 
- 
+ //delegating socket.io, so that it can be used in any js file other than app.ja also
 io.sockets.on('connection', function (socket) {
  socketMVC.init(io, socket, {
     debug: true,
