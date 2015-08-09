@@ -43,7 +43,8 @@ function startWebsiteWatchTimer(url, seconds, name)
         checkStatus(url, name);
     }, seconds * 1000);    
 }
-
+var webName;
+var webURL;
 function checkStatus(url, name)
 {
     var curl = new Curl();
@@ -55,6 +56,8 @@ function checkStatus(url, name)
 
         console.info( 'URL', url);
         console.info( 'Status Code: ', statusCode );
+        webName = name;
+        webURL = url;
         pushStatusToClients(name, url, statusCode, this.getInfo('TOTAL_TIME'));
         console.info( 'TOTAL_TIME: ', this.getInfo('TOTAL_TIME') );
         console.info( 'Body length: ', body.length );
@@ -78,6 +81,7 @@ function cb(statusOrError)
 
     if (typeof statusOrError !== "number") { //we have an error
         console.error(siteName, ' - Error: ', statusOrError);
+        pushStatusToClients(webName, webURL, 404, 0.0);
     } else {
         console.info(siteName, ': ', statusOrError);
     }
