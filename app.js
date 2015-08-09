@@ -41,7 +41,7 @@ app.get('/api/getGraphData/:name', websiteGraphController.find);
 
 //sendAlertMail();
 
-server.listen(3000, function() {
+server.listen(8002, function() {
     console.log('Listening ...');
 });
 
