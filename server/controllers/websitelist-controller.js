@@ -47,6 +47,8 @@ var webName;
 var webURL;
 function checkStatus(url, name)
 {
+    webName = name;
+    webURL = url;
     var curl = new Curl();
     curl.setOpt('URL', url);
     curl.setOpt( Curl.option.TIMEOUT, 30 );
@@ -56,8 +58,6 @@ function checkStatus(url, name)
 
         console.info( 'URL', url);
         console.info( 'Status Code: ', statusCode );
-        webName = name;
-        webURL = url;
         pushStatusToClients(name, url, statusCode, this.getInfo('TOTAL_TIME'));
 
         this.close();
