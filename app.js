@@ -32,6 +32,7 @@ app.use('/css', express.static(__dirname + '/client/css'));
 //REST API
 app.post('/api/websites', websiteListController.create);
 app.get('/api/websites', websiteTableController.list);
+app.get('/api/website/:name', websiteGraphController.findWebsite);
 app.get('/api/getGraphData', websiteGraphController.list);
 app.get('/api/getGraphData/:name', websiteGraphController.find);
 // checkStatus('http://www.facebook.com/404');
