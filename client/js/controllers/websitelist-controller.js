@@ -18,7 +18,7 @@ app.controller('addWebsiteController', ['$scope', '$resource', function ($scope,
 		monitor.mailID = $scope.mailID;
 		monitor.mobileNumber = $scope.mobileNumber;
 		monitor.mobileProvider = $scope.mobileProvider;
-		monitor.isUp = "";
+		monitor.isUp = "checking...";
 		monitor.isAlert = true;
 
 		monitor.$save(function(result) {
