@@ -59,8 +59,6 @@ function checkStatus(url, name)
         webName = name;
         webURL = url;
         pushStatusToClients(name, url, statusCode, this.getInfo('TOTAL_TIME'));
-        console.info( 'TOTAL_TIME: ', this.getInfo('TOTAL_TIME') );
-        console.info( 'Body length: ', body.length );
 
         this.close();
     });
@@ -81,7 +79,7 @@ function cb(statusOrError)
 
     if (typeof statusOrError !== "number") { //we have an error
         console.error(siteName, ' - Error: ', statusOrError);
-        pushStatusToClients(webName, webURL, 404, 0.0);
+        pushStatusToClients(webName, webURL, "404", "0.0");
     } else {
         console.info(siteName, ': ', statusOrError);
     }
@@ -90,7 +88,7 @@ function cb(statusOrError)
 
 function pushStatusToClients(name, url, statusCode, responseTime)
 {
-    var isUp;
+    var isUp = "false";
     if(parseInt(statusCode) == 200)
     {
         isUp = "true";
