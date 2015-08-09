@@ -119,12 +119,15 @@ function updateWebsitesMongoDB(name, url, statusCode, responseTime, isUp)
         console.log(results);
         isUpDB = results.isUp;
        
-       addWebsitePingMongoDB(results._id, name, statusCode, responseTime, isUp);
+       
 
        if(isUpDB === isUp)
        {
+            addWebsitePingMongoDB(results._id, name, statusCode, responseTime, isUp, "false");
             return;
        }
+
+       addWebsitePingMongoDB(results._id, name, statusCode, responseTime, isUp, "true");
 
        if(results.isAlert)
        {
@@ -143,7 +146,7 @@ function updateWebsitesMongoDB(name, url, statusCode, responseTime, isUp)
     });
 }
 
-function addWebsitePingMongoDB(websiteID, name, statusCode, responseTime, isUp)
+function addWebsitePingMongoDB(websiteID, name, statusCode, responseTime, isUp, isStatusChange)
 {
     var ping = new Ping();
     ping.name = name;
@@ -151,6 +154,7 @@ function addWebsitePingMongoDB(websiteID, name, statusCode, responseTime, isUp)
     ping.isUp = isUp;
     ping.statusCode = statusCode;
     ping.responseTime = responseTime;
+    ping.isStatusChange = isStatusChange;
 
     ping.save(function(result) {
         console.log("saved - PING");
