@@ -91,6 +91,10 @@ function pushStatusToClients(name, url, statusCode, responseTime)
     {
         isUp = "true";
     }
+    else if(parseInt(statusCode) == 404)
+    {
+        isUp = "false";
+    }
     socketMVC.everyone('websiteStatus', {'name' : name, 'statusCode' : statusCode, 'isUp' : isUp, 'responseTime': responseTime});
    
     updateWebsitesMongoDB(name, url, statusCode, responseTime, isUp);
